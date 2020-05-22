@@ -1,0 +1,54 @@
+class FooBar {
+    private int n;
+    private Lock lock;
+    private Condition cond;
+    private boolean fooed;
+
+    public FooBar(int n) {
+        this.n = n;
+        this.lock = new ReentrantLock();
+        this.cond = this.lock.newCondition();
+        this.fooed = false;
+
+    }
+
+    public void foo(Runnable printFoo) throws InterruptedException {
+        for (int i = 0; i < n; i++) {
+            //System.out.println("z");
+            this.lock.lock();
+            //System.out.println("y");
+            while(this.fooed == true) this.cond.await();
+            //System.out.println("x");
+        	// printFoo.run() outputs "foo". Do not change or remove this line.
+        	printFoo.run();
+            //System.out.println("w");
+            this.fooed = true;
+            //System.out.println("u");
+
+            //System.out.println("v");
+            this.cond.signalAll();
+            //System.out.println("k");
+            this.lock.unlock();
+        }
+    }
+
+    public void bar(Runnable printBar) throws InterruptedException {
+        for (int i = 0; i < n; i++) {
+            //System.out.println("a");
+            this.lock.lock();
+            //System.out.println("b");
+            while(this.fooed != true) this.cond.await();
+            //System.out.println("c");
+            // printBar.run() outputs "bar". Do not change or remove this line.
+        	printBar.run();
+            //System.out.println("d");
+            this.fooed = false;
+            //System.out.println("e");
+
+            //System.out.println("f");
+            this.cond.signalAll();
+            //System.out.println("g");
+            this.lock.unlock();
+        }
+    }
+}
